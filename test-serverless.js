@@ -5,7 +5,7 @@ const app = require('./api/index.js');
 
 const PORT = process.env.PORT || 3001;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`🚀 GetConnected serverless function running locally on http://localhost:${PORT}`);
   console.log('');
   console.log('Test endpoints:');
@@ -15,4 +15,19 @@ app.listen(PORT, () => {
   console.log(`- Users:         http://localhost:${PORT}/api/users`);
   console.log('');
   console.log('Press Ctrl+C to stop the server');
+});
+
+// Handle server errors
+server.on('error', (err) => {
+  console.error('Server error:', err);
+  process.exit(1);
+});
+
+// Graceful shutdown
+process.on('SIGINT', () => {
+  console.log('\nShutting down server...');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
 });

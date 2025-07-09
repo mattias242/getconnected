@@ -19,7 +19,10 @@
     "deploy:railway": "node deploy.js railway",
     "dev": "NODE_ENV=development node src/web/server.js",
     "prod": "NODE_ENV=production node src/web/server.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
     "lint": "echo \"No linting configured\"",
     "clean": "node deploy.js cleanup"
   },
@@ -36,5 +39,10 @@
     "express-static": "^1.2.6",
     "inquirer": "^12.7.0",
     "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "jest": "^30.0.4",
+    "jsdom": "^26.1.0",
+    "supertest": "^7.1.3"
   }
 }

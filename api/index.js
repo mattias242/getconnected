@@ -224,6 +224,11 @@ app.post('/api/users', (req, res) => {
   try {
     const { name, email } = req.body;
     
+    // Validate required fields
+    if (!name || name.trim() === '') {
+      return res.status(400).json({ error: 'Name is required' });
+    }
+    
     // Check if user already exists
     const existingUser = users.find(u => u.name === name);
     if (existingUser) {
@@ -232,7 +237,7 @@ app.post('/api/users', (req, res) => {
     
     const user = {
       id: generateId(),
-      name,
+      name: name.trim(),
       email: email || null,
       created_at: new Date().toISOString()
     };
@@ -732,7 +737,320 @@ app.get('/', (req, res) => {
         }
 
         function addUserPreferences(userId) {
-            alert(\`Add preferences for user \${userId}. This would typically open a preferences form.\`);
+            const user = users.find(u => u.id === userId);
+            if (!user) {
+                showAlert('User not found', 'error');
+                return;
+            }
+            
+            showPreferencesModal(user);
+        }
+
+        function showPreferencesModal(user) {
+            // Create modal overlay
+            const modalOverlay = document.createElement('div');
+            modalOverlay.className = 'modal-overlay';
+            modalOverlay.style.cssText = \`
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            \`;
+            
+            // Create modal content
+            const modalContent = document.createElement('div');
+            modalContent.className = 'modal-content';
+            modalContent.style.cssText = \`
+                background: white;
+                padding: 2rem;
+                border-radius: 10px;
+                max-width: 600px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            \`;
+            
+            modalContent.innerHTML = \`
+                <h2>Add Preferences for \${user.name}</h2>
+                <p>Set your preferences for each messaging platform:</p>
+                <div id="preferencesForm">
+                    <div class="platform-preferences">
+                        <div class="platform-item">
+                            <h3>WhatsApp</h3>
+                            <label>
+                                <input type="checkbox" id="whatsapp-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="whatsapp-preference" min="1" max="10" value="5">
+                                <span id="whatsapp-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="whatsapp-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>Telegram</h3>
+                            <label>
+                                <input type="checkbox" id="telegram-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="telegram-preference" min="1" max="10" value="5">
+                                <span id="telegram-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="telegram-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>Signal</h3>
+                            <label>
+                                <input type="checkbox" id="signal-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="signal-preference" min="1" max="10" value="5">
+                                <span id="signal-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="signal-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>Discord</h3>
+                            <label>
+                                <input type="checkbox" id="discord-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="discord-preference" min="1" max="10" value="5">
+                                <span id="discord-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="discord-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>Slack</h3>
+                            <label>
+                                <input type="checkbox" id="slack-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="slack-preference" min="1" max="10" value="5">
+                                <span id="slack-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="slack-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>Messenger</h3>
+                            <label>
+                                <input type="checkbox" id="messenger-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="messenger-preference" min="1" max="10" value="5">
+                                <span id="messenger-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="messenger-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>iMessage</h3>
+                            <label>
+                                <input type="checkbox" id="imessage-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="imessage-preference" min="1" max="10" value="5">
+                                <span id="imessage-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="imessage-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                        
+                        <div class="platform-item">
+                            <h3>Teams</h3>
+                            <label>
+                                <input type="checkbox" id="teams-account" checked> Has Account
+                            </label>
+                            <label>
+                                Preference Level (1-10):
+                                <input type="range" id="teams-preference" min="1" max="10" value="5">
+                                <span id="teams-value">5</span>
+                            </label>
+                            <label>
+                                Notes:
+                                <input type="text" id="teams-notes" placeholder="Optional notes">
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <div class="modal-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
+                        <button type="button" class="btn btn-secondary" onclick="closePreferencesModal()">Cancel</button>
+                        <button type="button" class="btn" onclick="savePreferences(\${user.id})">Save Preferences</button>
+                    </div>
+                </div>
+            \`;
+            
+            // Add CSS for the modal
+            const style = document.createElement('style');
+            style.textContent = \`
+                .platform-preferences {
+                    display: grid;
+                    gap: 1.5rem;
+                }
+                
+                .platform-item {
+                    background: #f8f9fa;
+                    padding: 1rem;
+                    border-radius: 8px;
+                    border: 1px solid #e9ecef;
+                }
+                
+                .platform-item h3 {
+                    color: #667eea;
+                    margin-bottom: 0.5rem;
+                }
+                
+                .platform-item label {
+                    display: block;
+                    margin-bottom: 0.5rem;
+                    font-weight: 500;
+                }
+                
+                .platform-item input[type="range"] {
+                    width: 100%;
+                    margin: 0.5rem 0;
+                }
+                
+                .platform-item input[type="text"] {
+                    width: 100%;
+                    padding: 0.5rem;
+                    border: 1px solid #ccc;
+                    border-radius: 4px;
+                    margin-top: 0.25rem;
+                }
+                
+                .modal-overlay {
+                    animation: fadeIn 0.3s ease-out;
+                }
+                
+                @keyframes fadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+                
+                .modal-content {
+                    animation: slideIn 0.3s ease-out;
+                }
+                
+                @keyframes slideIn {
+                    from { transform: translateY(-50px); opacity: 0; }
+                    to { transform: translateY(0); opacity: 1; }
+                }
+            \`;
+            
+            document.head.appendChild(style);
+            modalOverlay.appendChild(modalContent);
+            document.body.appendChild(modalOverlay);
+            
+            // Add event listeners for range inputs
+            const platforms = ['whatsapp', 'telegram', 'signal', 'discord', 'slack', 'messenger', 'imessage', 'teams'];
+            platforms.forEach(platform => {
+                const rangeInput = document.getElementById(\`\${platform}-preference\`);
+                const valueDisplay = document.getElementById(\`\${platform}-value\`);
+                
+                if (rangeInput && valueDisplay) {
+                    rangeInput.addEventListener('input', (e) => {
+                        valueDisplay.textContent = e.target.value;
+                    });
+                }
+            });
+            
+            // Close modal when clicking outside
+            modalOverlay.addEventListener('click', (e) => {
+                if (e.target === modalOverlay) {
+                    closePreferencesModal();
+                }
+            });
+        }
+
+        function closePreferencesModal() {
+            const modalOverlay = document.querySelector('.modal-overlay');
+            if (modalOverlay) {
+                modalOverlay.remove();
+            }
+        }
+
+        async function savePreferences(userId) {
+            const platforms = ['whatsapp', 'telegram', 'signal', 'discord', 'slack', 'messenger', 'imessage', 'teams'];
+            const preferences = [];
+            
+            // Collect preferences for each platform
+            platforms.forEach(platform => {
+                const hasAccount = document.getElementById(\`\${platform}-account\`)?.checked || false;
+                const preferenceLevel = parseInt(document.getElementById(\`\${platform}-preference\`)?.value || 5);
+                const notes = document.getElementById(\`\${platform}-notes\`)?.value || '';
+                
+                if (hasAccount) {
+                    preferences.push({
+                        platform,
+                        preferenceLevel,
+                        hasAccount,
+                        notes
+                    });
+                }
+            });
+            
+            // Save each preference via API
+            try {
+                for (const pref of preferences) {
+                    const response = await fetch(\`/api/users/\${userId}/preferences\`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(pref)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Failed to save preference');
+                    }
+                }
+                
+                showAlert('Preferences saved successfully!', 'success');
+                closePreferencesModal();
+                
+                // Refresh the user display if needed
+                loadUsers();
+                
+            } catch (error) {
+                showAlert('Error saving preferences: ' + error.message, 'error');
+            }
         }
 
         function getSelectedFeatures() {
@@ -780,40 +1098,44 @@ app.get('/', (req, res) => {
 
         function renderResults(result) {
             const analysisDiv = document.getElementById('analysisResults');
-            analysisDiv.innerHTML = \`
-                <div class="alert alert-info">
-                    <strong>Analysis:</strong> \${result.commonPlatforms.analysis}
-                </div>
-                <h3>Common Platforms (\${result.commonPlatforms.commonPlatforms.length})</h3>
-                <div class="platform-grid">
-                    \${result.commonPlatforms.commonPlatforms.map(platform => \`
-                        <div class="platform-card">
-                            <h3>\${platform.name}</h3>
-                            <p>Average Preference: <span class="score">\${platform.averagePreference ? platform.averagePreference.toFixed(1) : 'N/A'}/10</span></p>
-                            <p>Privacy Score: \${platform.privacyScore}/10</p>
-                            <p>Popularity: \${platform.popularityScore}/10</p>
-                        </div>
-                    \`).join('')}
-                </div>
-            \`;
+            if (analysisDiv) {
+                analysisDiv.innerHTML = \`
+                    <div class="alert alert-info">
+                        <strong>Analysis:</strong> \${result.commonPlatforms.analysis}
+                    </div>
+                    <h3>Common Platforms (\${result.commonPlatforms.commonPlatforms.length})</h3>
+                    <div class="platform-grid">
+                        \${result.commonPlatforms.commonPlatforms.map(platform => \`
+                            <div class="platform-card">
+                                <h3>\${platform.name}</h3>
+                                <p>Average Preference: <span class="score">\${platform.averagePreference ? platform.averagePreference.toFixed(1) : 'N/A'}/10</span></p>
+                                <p>Privacy Score: \${platform.privacyScore}/10</p>
+                                <p>Popularity: \${platform.popularityScore}/10</p>
+                            </div>
+                        \`).join('')}
+                    </div>
+                \`;
+            }
 
             const recommendationsDiv = document.getElementById('recommendations');
-            recommendationsDiv.innerHTML = \`
-                <div class="alert alert-success">
-                    <strong>Recommendation:</strong> \${result.recommendations.reason}
-                </div>
-                <div class="platform-grid">
-                    \${result.recommendations.recommendations.map((rec, index) => \`
-                        <div class="platform-card">
-                            <h3>#\${index + 1} \${rec.name}</h3>
-                            <p>Recommendation Score: <span class="score">\${rec.recommendationScore}</span></p>
-                            <p>Average Preference: \${rec.averagePreference ? rec.averagePreference.toFixed(1) : 'N/A'}/10</p>
-                            <p>Feature Match: \${rec.featureMatch ? '✅' : '❌'}</p>
-                            \${rec.missingFeatures.length > 0 ? \`<p>Missing: \${rec.missingFeatures.join(', ')}</p>\` : ''}
-                        </div>
-                    \`).join('')}
-                </div>
-            \`;
+            if (recommendationsDiv) {
+                recommendationsDiv.innerHTML = \`
+                    <div class="alert alert-success">
+                        <strong>Recommendation:</strong> \${result.recommendations.reason}
+                    </div>
+                    <div class="platform-grid">
+                        \${result.recommendations.recommendations.map((rec, index) => \`
+                            <div class="platform-card">
+                                <h3>#\${index + 1} \${rec.name}</h3>
+                                <p>Recommendation Score: <span class="score">\${rec.recommendationScore}</span></p>
+                                <p>Average Preference: \${rec.averagePreference ? rec.averagePreference.toFixed(1) : 'N/A'}/10</p>
+                                <p>Feature Match: \${rec.featureMatch ? '✅' : '❌'}</p>
+                                \${rec.missingFeatures.length > 0 ? \`<p>Missing: \${rec.missingFeatures.join(', ')}</p>\` : ''}
+                            </div>
+                        \`).join('')}
+                    </div>
+                \`;
+            }
         }
 
         async function exportData() {
@@ -868,8 +1190,10 @@ app.get('/', (req, res) => {
 
         function showLoading() {
             const resultsDiv = document.getElementById('results');
-            resultsDiv.classList.remove('hidden');
-            resultsDiv.innerHTML = '<div class="loading">Analyzing group preferences...</div>';
+            if (resultsDiv) {
+                resultsDiv.classList.remove('hidden');
+                resultsDiv.innerHTML = '<div class="loading">Analyzing group preferences...</div>';
+            }
         }
     </script>
 </body>
@@ -896,5 +1220,13 @@ app.use((err, req, res, next) => {
     timestamp: new Date().toISOString()
   });
 });
+
+// Start server if not in serverless mode
+if (require.main === module) {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
 
 module.exports = app;

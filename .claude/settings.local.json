@@ -18,7 +18,12 @@
       "Bash(git push:*)",
       "Bash(npm update)",
       "Bash(curl:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(true)",
+      "Bash(npm run:*)",
+      "Bash(lsof:*)",
+      "Bash(npm test)",
+      "Bash(npx jest:*)"
     ],
     "deny": []
   }
