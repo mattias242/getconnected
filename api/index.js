@@ -508,64 +508,370 @@ app.post('/api/export', (req, res) => {
   }
 });
 
-// Serve main HTML page
+// Serve main HTML page with full interactive interface
 app.get('/', (req, res) => {
   res.send(`
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>GetConnected</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GetConnected - Group Messaging Coordinator</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 40px; line-height: 1.6; }
-        .container { max-width: 800px; margin: 0 auto; }
-        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center; border-radius: 10px; margin-bottom: 2rem; }
-        .section { background: #f8f9fa; padding: 2rem; margin: 1rem 0; border-radius: 10px; border: 1px solid #e9ecef; }
-        .btn { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 5px; text-decoration: none; display: inline-block; margin: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f5f5f5; color: #333; line-height: 1.6; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem 0; text-align: center; margin-bottom: 2rem; border-radius: 10px; }
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .header p { font-size: 1.2rem; opacity: 0.9; }
+        .section { background: white; padding: 2rem; margin: 1rem 0; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section h2 { color: #667eea; margin-bottom: 1rem; font-size: 1.5rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+        input, select, textarea { width: 100%; padding: 0.75rem; border: 2px solid #e1e1e1; border-radius: 5px; font-size: 1rem; transition: border-color 0.3s; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #667eea; }
+        .btn { background: #667eea; color: white; padding: 0.75rem 1.5rem; border: none; border-radius: 5px; font-size: 1rem; cursor: pointer; transition: background 0.3s; margin-right: 0.5rem; }
         .btn:hover { background: #5a67d8; }
-        .endpoint { background: #fff; padding: 1rem; margin: 0.5rem 0; border-radius: 5px; border-left: 4px solid #667eea; }
+        .btn-secondary { background: #718096; }
+        .btn-secondary:hover { background: #4a5568; }
+        .user-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .user-card { background: #f8f9fa; padding: 1rem; border-radius: 8px; border: 2px solid #e1e1e1; cursor: pointer; }
+        .user-card.selected { border-color: #667eea; background: #edf2f7; }
+        .user-card h3 { color: #667eea; margin-bottom: 0.5rem; }
+        .platform-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .platform-card { background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea; }
+        .platform-card h3 { color: #667eea; margin-bottom: 0.5rem; }
+        .score { font-weight: bold; color: #48bb78; }
+        .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.5rem; margin-top: 1rem; }
+        .feature-item { display: flex; align-items: center; gap: 0.5rem; }
+        .feature-item input[type="checkbox"] { width: auto; }
+        .results { margin-top: 2rem; }
+        .alert { padding: 1rem; border-radius: 5px; margin-bottom: 1rem; }
+        .alert-success { background: #c6f6d5; color: #22543d; border: 1px solid #9ae6b4; }
+        .alert-error { background: #fed7d7; color: #742a2a; border: 1px solid #feb2b2; }
+        .alert-info { background: #bee3f8; color: #2a4365; border: 1px solid #90cdf4; }
+        .hidden { display: none; }
+        .loading { text-align: center; padding: 2rem; color: #667eea; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="header">
-            <h1>🚀 GetConnected</h1>
-            <p>Cross-platform messaging app preference matcher</p>
+            <h1>GetConnected</h1>
+            <p>Find the perfect messaging platform for your group</p>
         </div>
-        
+
+        <!-- User Management Section -->
         <div class="section">
-            <h2>📡 API Endpoints</h2>
-            <div class="endpoint">
-                <strong>GET /api/platforms</strong> - List all messaging platforms
-                <br><a href="/api/platforms" class="btn">Try it</a>
+            <h2>👥 Manage Users</h2>
+            <div class="form-group">
+                <label for="userName">Add New User:</label>
+                <input type="text" id="userName" placeholder="Enter user name">
             </div>
-            <div class="endpoint">
-                <strong>GET /api/health</strong> - Health check
-                <br><a href="/api/health" class="btn">Try it</a>
+            <div class="form-group">
+                <label for="userEmail">Email (optional):</label>
+                <input type="email" id="userEmail" placeholder="Enter email">
             </div>
-            <div class="endpoint">
-                <strong>GET /api/users</strong> - List all users
-                <br><a href="/api/users" class="btn">Try it</a>
+            <button class="btn" onclick="addUser()">Add User</button>
+            <button class="btn btn-secondary" onclick="loadUsers()">Refresh Users</button>
+        </div>
+
+        <!-- User List -->
+        <div class="section">
+            <h2>Select Group Members</h2>
+            <div id="userList" class="user-list">
+                <!-- Users will be loaded here -->
             </div>
         </div>
 
+        <!-- Feature Requirements -->
         <div class="section">
-            <h2>✨ Features</h2>
-            <ul>
-                <li>🔍 Analyze group messaging preferences</li>
-                <li>🎯 Get intelligent platform recommendations</li>
-                <li>👥 Manage users and their preferences</li>
-                <li>📊 Export analysis data</li>
-                <li>📅 Schedule group meetings</li>
-            </ul>
+            <h2>🔧 Feature Requirements</h2>
+            <p>Select the features that are important for your group:</p>
+            <div class="features">
+                <div class="feature-item">
+                    <input type="checkbox" id="voiceCalls" value="voiceCalls">
+                    <label for="voiceCalls">Voice Calls</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="videoCalls" value="videoCalls">
+                    <label for="videoCalls">Video Calls</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="fileSharing" value="fileSharing">
+                    <label for="fileSharing">File Sharing</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="screenSharing" value="screenSharing">
+                    <label for="screenSharing">Screen Sharing</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="endToEndEncryption" value="endToEndEncryption">
+                    <label for="endToEndEncryption">End-to-End Encryption</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="threading" value="threading">
+                    <label for="threading">Threading</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="bots" value="bots">
+                    <label for="bots">Bots/Integrations</label>
+                </div>
+                <div class="feature-item">
+                    <input type="checkbox" id="businessFeatures" value="businessFeatures">
+                    <label for="businessFeatures">Business Features</label>
+                </div>
+            </div>
         </div>
 
+        <!-- Analysis Button -->
         <div class="section">
-            <h2>🌟 About</h2>
-            <p>GetConnected helps groups find their messaging app common denominators and facilitates group communication across 8 major platforms including WhatsApp, Telegram, Signal, Discord, Slack, and more.</p>
-            <p><strong>Note:</strong> This is the serverless demo version. For full CLI functionality, clone the repository and run locally.</p>
-            <p><a href="https://github.com/mattias242/getconnected" class="btn">View on GitHub</a></p>
+            <button class="btn" onclick="analyzeGroup()">🔍 Analyze Group</button>
+            <button class="btn btn-secondary" onclick="exportData()">📊 Export Data</button>
+        </div>
+
+        <!-- Results Section -->
+        <div id="results" class="results hidden">
+            <div class="section">
+                <h2>📊 Analysis Results</h2>
+                <div id="analysisResults"></div>
+            </div>
+
+            <div class="section">
+                <h2>🏆 Recommended Platforms</h2>
+                <div id="recommendations"></div>
+            </div>
         </div>
     </div>
+
+    <script>
+        let users = [];
+        let selectedUsers = [];
+        let currentGroupId = null;
+        let recommendations = [];
+
+        // Load users on page load
+        document.addEventListener('DOMContentLoaded', loadUsers);
+
+        async function loadUsers() {
+            try {
+                const response = await fetch('/api/users');
+                users = await response.json();
+                renderUsers();
+            } catch (error) {
+                showAlert('Error loading users: ' + error.message, 'error');
+            }
+        }
+
+        function renderUsers() {
+            const userList = document.getElementById('userList');
+            userList.innerHTML = '';
+
+            if (users.length === 0) {
+                userList.innerHTML = '<p>No users found. Add some users first!</p>';
+                return;
+            }
+
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                userCard.innerHTML = \`
+                    <h3>\${user.name}</h3>
+                    <p>\${user.email || 'No email'}</p>
+                    <button class="btn btn-secondary" onclick="addUserPreferences(\${user.id})">Add Preferences</button>
+                \`;
+                
+                userCard.addEventListener('click', (e) => {
+                    if (e.target.tagName !== 'BUTTON') {
+                        toggleUser(user.id, userCard);
+                    }
+                });
+                userList.appendChild(userCard);
+            });
+        }
+
+        function toggleUser(userId, element) {
+            const index = selectedUsers.indexOf(userId);
+            if (index > -1) {
+                selectedUsers.splice(index, 1);
+                element.classList.remove('selected');
+            } else {
+                selectedUsers.push(userId);
+                element.classList.add('selected');
+            }
+        }
+
+        async function addUser() {
+            const name = document.getElementById('userName').value.trim();
+            const email = document.getElementById('userEmail').value.trim();
+
+            if (!name) {
+                showAlert('Please enter a user name', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/users', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email: email || null })
+                });
+
+                if (response.ok) {
+                    document.getElementById('userName').value = '';
+                    document.getElementById('userEmail').value = '';
+                    showAlert('User added successfully', 'success');
+                    loadUsers();
+                } else {
+                    const error = await response.json();
+                    showAlert('Error adding user: ' + error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error adding user: ' + error.message, 'error');
+            }
+        }
+
+        function addUserPreferences(userId) {
+            alert(\`Add preferences for user \${userId}. This would typically open a preferences form.\`);
+        }
+
+        function getSelectedFeatures() {
+            const features = [];
+            const checkboxes = document.querySelectorAll('.feature-item input[type="checkbox"]:checked');
+            checkboxes.forEach(checkbox => features.push(checkbox.value));
+            return features;
+        }
+
+        async function analyzeGroup() {
+            if (selectedUsers.length === 0) {
+                showAlert('Please select at least one user', 'error');
+                return;
+            }
+
+            const requiredFeatures = getSelectedFeatures();
+            
+            try {
+                showLoading();
+                
+                const response = await fetch('/api/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userIds: selectedUsers,
+                        requiredFeatures
+                    })
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    currentGroupId = result.groupId;
+                    recommendations = result.recommendations.recommendations;
+                    
+                    renderResults(result);
+                    document.getElementById('results').classList.remove('hidden');
+                } else {
+                    const error = await response.json();
+                    showAlert('Error analyzing group: ' + error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error analyzing group: ' + error.message, 'error');
+            }
+        }
+
+        function renderResults(result) {
+            const analysisDiv = document.getElementById('analysisResults');
+            analysisDiv.innerHTML = \`
+                <div class="alert alert-info">
+                    <strong>Analysis:</strong> \${result.commonPlatforms.analysis}
+                </div>
+                <h3>Common Platforms (\${result.commonPlatforms.commonPlatforms.length})</h3>
+                <div class="platform-grid">
+                    \${result.commonPlatforms.commonPlatforms.map(platform => \`
+                        <div class="platform-card">
+                            <h3>\${platform.name}</h3>
+                            <p>Average Preference: <span class="score">\${platform.averagePreference ? platform.averagePreference.toFixed(1) : 'N/A'}/10</span></p>
+                            <p>Privacy Score: \${platform.privacyScore}/10</p>
+                            <p>Popularity: \${platform.popularityScore}/10</p>
+                        </div>
+                    \`).join('')}
+                </div>
+            \`;
+
+            const recommendationsDiv = document.getElementById('recommendations');
+            recommendationsDiv.innerHTML = \`
+                <div class="alert alert-success">
+                    <strong>Recommendation:</strong> \${result.recommendations.reason}
+                </div>
+                <div class="platform-grid">
+                    \${result.recommendations.recommendations.map((rec, index) => \`
+                        <div class="platform-card">
+                            <h3>#\${index + 1} \${rec.name}</h3>
+                            <p>Recommendation Score: <span class="score">\${rec.recommendationScore}</span></p>
+                            <p>Average Preference: \${rec.averagePreference ? rec.averagePreference.toFixed(1) : 'N/A'}/10</p>
+                            <p>Feature Match: \${rec.featureMatch ? '✅' : '❌'}</p>
+                            \${rec.missingFeatures.length > 0 ? \`<p>Missing: \${rec.missingFeatures.join(', ')}</p>\` : ''}
+                        </div>
+                    \`).join('')}
+                </div>
+            \`;
+        }
+
+        async function exportData() {
+            if (selectedUsers.length === 0) {
+                showAlert('Please select users and analyze the group first', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/export', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userIds: selectedUsers,
+                        format: 'json'
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    downloadJSON(data, 'group-analysis.json');
+                } else {
+                    const error = await response.json();
+                    showAlert('Error exporting data: ' + error.error, 'error');
+                }
+            } catch (error) {
+                showAlert('Error exporting data: ' + error.message, 'error');
+            }
+        }
+
+        function downloadJSON(data, filename) {
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function showAlert(message, type) {
+            const alert = document.createElement('div');
+            alert.className = \`alert alert-\${type}\`;
+            alert.textContent = message;
+            
+            document.body.insertBefore(alert, document.body.firstChild);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        function showLoading() {
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.classList.remove('hidden');
+            resultsDiv.innerHTML = '<div class="loading">Analyzing group preferences...</div>';
+        }
+    </script>
 </body>
 </html>
   `);
