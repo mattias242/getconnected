@@ -1,18 +1,205 @@
 // Serverless-compatible version of the web server for Vercel
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
-
-// Import our components
-const { getAllPlatforms } = require('../models/platforms');
 
 const app = express();
 
 // Middleware
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'public')));
+
+// Embedded platform data for serverless environment
+const messagingPlatforms = {
+  whatsapp: {
+    name: 'WhatsApp',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: false,
+      endToEndEncryption: true,
+      desktopApp: true,
+      webApp: true,
+      maxGroupSize: 1024,
+      businessFeatures: false,
+      integrations: false,
+      threading: false,
+      customEmojis: false,
+      bots: false
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    privacyScore: 7,
+    popularityScore: 10,
+    businessFriendly: false,
+    freeToUse: true,
+    requiresPhoneNumber: true
+  },
+  telegram: {
+    name: 'Telegram',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: false,
+      endToEndEncryption: true,
+      desktopApp: true,
+      webApp: true,
+      maxGroupSize: 200000,
+      businessFeatures: false,
+      integrations: true,
+      threading: false,
+      customEmojis: true,
+      bots: true
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    privacyScore: 8,
+    popularityScore: 8,
+    businessFriendly: false,
+    freeToUse: true,
+    requiresPhoneNumber: true
+  },
+  signal: {
+    name: 'Signal',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: false,
+      endToEndEncryption: true,
+      desktopApp: true,
+      webApp: false,
+      maxGroupSize: 1000,
+      businessFeatures: false,
+      integrations: false,
+      threading: false,
+      customEmojis: false,
+      bots: false
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux'],
+    privacyScore: 10,
+    popularityScore: 6,
+    businessFriendly: false,
+    freeToUse: true,
+    requiresPhoneNumber: true
+  },
+  discord: {
+    name: 'Discord',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: true,
+      endToEndEncryption: false,
+      desktopApp: true,
+      webApp: true,
+      maxGroupSize: 500000,
+      businessFeatures: false,
+      integrations: true,
+      threading: true,
+      customEmojis: true,
+      bots: true
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    privacyScore: 5,
+    popularityScore: 9,
+    businessFriendly: false,
+    freeToUse: true,
+    requiresPhoneNumber: false
+  },
+  slack: {
+    name: 'Slack',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: true,
+      endToEndEncryption: false,
+      desktopApp: true,
+      webApp: true,
+      maxGroupSize: 500000,
+      businessFeatures: true,
+      integrations: true,
+      threading: true,
+      customEmojis: true,
+      bots: true
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    privacyScore: 6,
+    popularityScore: 7,
+    businessFriendly: true,
+    freeToUse: false,
+    requiresPhoneNumber: false
+  },
+  messenger: {
+    name: 'Facebook Messenger',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: false,
+      endToEndEncryption: true,
+      desktopApp: true,
+      webApp: true,
+      maxGroupSize: 250,
+      businessFeatures: false,
+      integrations: false,
+      threading: false,
+      customEmojis: true,
+      bots: false
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Web'],
+    privacyScore: 4,
+    popularityScore: 9,
+    businessFriendly: false,
+    freeToUse: true,
+    requiresPhoneNumber: false
+  },
+  teams: {
+    name: 'Microsoft Teams',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: true,
+      endToEndEncryption: false,
+      desktopApp: true,
+      webApp: true,
+      maxGroupSize: 250,
+      businessFeatures: true,
+      integrations: true,
+      threading: true,
+      customEmojis: false,
+      bots: true
+    },
+    platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    privacyScore: 6,
+    popularityScore: 8,
+    businessFriendly: true,
+    freeToUse: false,
+    requiresPhoneNumber: false
+  }
+};
+
+const getAllPlatforms = () => {
+  return Object.keys(messagingPlatforms).map(key => ({
+    key,
+    ...messagingPlatforms[key]
+  }));
+};
 
 // In-memory storage for serverless environment
 let users = [];
@@ -323,7 +510,65 @@ app.post('/api/export', (req, res) => {
 
 // Serve main HTML page
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GetConnected</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; margin: 40px; line-height: 1.6; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 2rem; text-align: center; border-radius: 10px; margin-bottom: 2rem; }
+        .section { background: #f8f9fa; padding: 2rem; margin: 1rem 0; border-radius: 10px; border: 1px solid #e9ecef; }
+        .btn { background: #667eea; color: white; padding: 12px 24px; border: none; border-radius: 5px; text-decoration: none; display: inline-block; margin: 5px; }
+        .btn:hover { background: #5a67d8; }
+        .endpoint { background: #fff; padding: 1rem; margin: 0.5rem 0; border-radius: 5px; border-left: 4px solid #667eea; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 GetConnected</h1>
+            <p>Cross-platform messaging app preference matcher</p>
+        </div>
+        
+        <div class="section">
+            <h2>📡 API Endpoints</h2>
+            <div class="endpoint">
+                <strong>GET /api/platforms</strong> - List all messaging platforms
+                <br><a href="/api/platforms" class="btn">Try it</a>
+            </div>
+            <div class="endpoint">
+                <strong>GET /api/health</strong> - Health check
+                <br><a href="/api/health" class="btn">Try it</a>
+            </div>
+            <div class="endpoint">
+                <strong>GET /api/users</strong> - List all users
+                <br><a href="/api/users" class="btn">Try it</a>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>✨ Features</h2>
+            <ul>
+                <li>🔍 Analyze group messaging preferences</li>
+                <li>🎯 Get intelligent platform recommendations</li>
+                <li>👥 Manage users and their preferences</li>
+                <li>📊 Export analysis data</li>
+                <li>📅 Schedule group meetings</li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>🌟 About</h2>
+            <p>GetConnected helps groups find their messaging app common denominators and facilitates group communication across 8 major platforms including WhatsApp, Telegram, Signal, Discord, Slack, and more.</p>
+            <p><strong>Note:</strong> This is the serverless demo version. For full CLI functionality, clone the repository and run locally.</p>
+            <p><a href="https://github.com/mattias242/getconnected" class="btn">View on GitHub</a></p>
+        </div>
+    </div>
+</body>
+</html>
+  `);
 });
 
 // Health check endpoint
@@ -331,14 +576,19 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV || 'development'
+    environment: 'serverless',
+    version: '1.0.0',
+    platforms: Object.keys(messagingPlatforms).length
   });
 });
 
 // Error handler
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ error: 'Something went wrong!' });
+  res.status(500).json({ 
+    error: 'Something went wrong!',
+    timestamp: new Date().toISOString()
+  });
 });
 
 module.exports = app;
