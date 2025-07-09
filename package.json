@@ -1,0 +1,40 @@
+{
+  "name": "getconnected",
+  "version": "1.0.0",
+  "description": "",
+  "main": "src/cli.js",
+  "bin": {
+    "getconnected": "./src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "web": "node src/web/server.js",
+    "web:serverless": "node src/web/serverless.js",
+    "build": "node scripts/build.js",
+    "deploy": "node deploy.js",
+    "deploy:local": "node deploy.js local --start",
+    "deploy:vercel": "node deploy.js vercel",
+    "deploy:docker": "node deploy.js docker --run",
+    "deploy:heroku": "node deploy.js heroku",
+    "deploy:railway": "node deploy.js railway",
+    "dev": "NODE_ENV=development node src/web/server.js",
+    "prod": "NODE_ENV=production node src/web/server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "echo \"No linting configured\"",
+    "clean": "node deploy.js cleanup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "axios": "^1.10.0",
+    "chalk": "^4.1.2",
+    "commander": "^14.0.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "express-static": "^1.2.6",
+    "inquirer": "^12.7.0",
+    "sqlite3": "^5.1.7"
+  }
+}
