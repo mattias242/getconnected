@@ -30,6 +30,10 @@ const messagingPlatforms = {
       bots: false
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/whatsapp-messenger/id310633997',
+      android: 'https://play.google.com/store/apps/details?id=com.whatsapp'
+    },
     privacyScore: 7,
     popularityScore: 10,
     businessFriendly: false,
@@ -56,6 +60,10 @@ const messagingPlatforms = {
       bots: true
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/telegram-messenger/id686449807',
+      android: 'https://play.google.com/store/apps/details?id=org.telegram.messenger'
+    },
     privacyScore: 8,
     popularityScore: 8,
     businessFriendly: false,
@@ -82,6 +90,10 @@ const messagingPlatforms = {
       bots: false
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/signal-private-messenger/id874139669',
+      android: 'https://play.google.com/store/apps/details?id=org.thoughtcrime.securesms'
+    },
     privacyScore: 10,
     popularityScore: 6,
     businessFriendly: false,
@@ -108,6 +120,10 @@ const messagingPlatforms = {
       bots: true
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/discord/id985746746',
+      android: 'https://play.google.com/store/apps/details?id=com.discord'
+    },
     privacyScore: 5,
     popularityScore: 9,
     businessFriendly: false,
@@ -134,6 +150,10 @@ const messagingPlatforms = {
       bots: true
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/slack/id618783545',
+      android: 'https://play.google.com/store/apps/details?id=com.Slack'
+    },
     privacyScore: 6,
     popularityScore: 7,
     businessFriendly: true,
@@ -160,6 +180,10 @@ const messagingPlatforms = {
       bots: false
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Web'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/messenger/id454638411',
+      android: 'https://play.google.com/store/apps/details?id=com.facebook.orca'
+    },
     privacyScore: 4,
     popularityScore: 9,
     businessFriendly: false,
@@ -186,11 +210,45 @@ const messagingPlatforms = {
       bots: true
     },
     platforms: ['iOS', 'Android', 'Windows', 'macOS', 'Linux', 'Web'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/microsoft-teams/id1113153706',
+      android: 'https://play.google.com/store/apps/details?id=com.microsoft.teams'
+    },
     privacyScore: 6,
     popularityScore: 8,
     businessFriendly: true,
     freeToUse: false,
     requiresPhoneNumber: false
+  },
+  imessage: {
+    name: 'iMessage',
+    features: {
+      textMessages: true,
+      voiceCalls: true,
+      videoCalls: true,
+      groupChats: true,
+      fileSharing: true,
+      screenSharing: true,
+      endToEndEncryption: true,
+      desktopApp: true,
+      webApp: false,
+      maxGroupSize: 32,
+      businessFeatures: false,
+      integrations: false,
+      threading: false,
+      customEmojis: true,
+      bots: false
+    },
+    platforms: ['iOS', 'macOS'],
+    appStoreLinks: {
+      ios: 'https://apps.apple.com/app/messages/id1146560473',
+      android: null
+    },
+    privacyScore: 9,
+    popularityScore: 8,
+    businessFriendly: false,
+    freeToUse: true,
+    requiresPhoneNumber: true
   }
 };
 
@@ -746,6 +804,53 @@ app.get('/', (req, res) => {
             showPreferencesModal(user);
         }
 
+        function generatePlatformCards() {
+            const platforms = [
+                { key: 'whatsapp', name: 'WhatsApp', emoji: '💬', color: '#25D366' },
+                { key: 'telegram', name: 'Telegram', emoji: '✈️', color: '#0088cc' },
+                { key: 'signal', name: 'Signal', emoji: '🔐', color: '#3a76f0' },
+                { key: 'discord', name: 'Discord', emoji: '🎮', color: '#7289da' },
+                { key: 'slack', name: 'Slack', emoji: '💼', color: '#4A154B' },
+                { key: 'messenger', name: 'Messenger', emoji: '💬', color: '#0084FF' },
+                { key: 'imessage', name: 'iMessage', emoji: '💙', color: '#007AFF' },
+                { key: 'teams', name: 'Teams', emoji: '🏢', color: '#6264A7' }
+            ];
+            
+            return platforms.map(platform => \`
+                <div class="platform-card" style="background: #2d2d44; border-radius: 12px; padding: 1.5rem; border: 2px solid #333; transition: all 0.3s; position: relative;">
+                    <div class="platform-header" style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
+                        <div style="font-size: 1.5rem;">\${platform.emoji}</div>
+                        <div>
+                            <h4 style="margin: 0; color: white; font-size: 1.1rem;">
+                                <a href="#" class="platform-link" data-platform="\${platform.key}" style="color: \${platform.color}; text-decoration: none; font-weight: 600; transition: all 0.3s;">
+                                    \${platform.name}
+                                </a>
+                            </h4>
+                        </div>
+                    </div>
+                    
+                    <div class="platform-controls">
+                        <label style="display: flex; align-items: center; gap: 0.75rem; cursor: pointer; margin-bottom: 1rem; padding: 0.5rem; border-radius: 8px; background: #1a1a2e; transition: all 0.3s;">
+                            <input type="checkbox" id="\${platform.key}-has-app" style="accent-color: \${platform.color}; transform: scale(1.2);">
+                            <span style="font-weight: 500; color: white;">I have this app</span>
+                        </label>
+                        
+                        <div class="preference-slider" id="\${platform.key}-slider" style="display: none; margin-top: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: #64ffda; font-size: 0.9rem;">
+                                How much do you like it? 
+                                <span id="\${platform.key}-value" style="color: \${platform.color}; font-weight: 600;">5</span>/10
+                            </label>
+                            <input type="range" id="\${platform.key}-preference" min="1" max="10" value="5" style="width: 100%; accent-color: \${platform.color}; background: #1a1a2e; border-radius: 4px;">
+                            <div style="display: flex; justify-content: space-between; font-size: 0.8rem; opacity: 0.7; margin-top: 0.25rem;">
+                                <span>Not much</span>
+                                <span>Love it!</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            \`).join('');
+        }
+
         function showPreferencesModal(user) {
             // Create modal overlay
             const modalOverlay = document.createElement('div');
@@ -756,164 +861,64 @@ app.get('/', (req, res) => {
                 left: 0;
                 width: 100%;
                 height: 100%;
-                background: rgba(0, 0, 0, 0.5);
+                background: rgba(0, 0, 0, 0.8);
                 display: flex;
                 justify-content: center;
                 align-items: center;
                 z-index: 1000;
+                animation: fadeIn 0.3s ease-out;
             \`;
             
             // Create modal content
             const modalContent = document.createElement('div');
             modalContent.className = 'modal-content';
             modalContent.style.cssText = \`
-                background: white;
+                background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+                color: white;
                 padding: 2rem;
-                border-radius: 10px;
-                max-width: 600px;
-                width: 90%;
-                max-height: 80vh;
+                border-radius: 20px;
+                max-width: 700px;
+                width: 95%;
+                max-height: 90vh;
                 overflow-y: auto;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                border: 1px solid #333;
+                animation: slideIn 0.3s ease-out;
             \`;
             
             modalContent.innerHTML = \`
-                <h2>Add Preferences for \${user.name}</h2>
-                <p>Set your preferences for each messaging platform:</p>
+                <div class="modal-header">
+                    <h2 style="margin: 0 0 0.5rem 0; color: #64ffda; font-size: 1.8rem;">📱 Setup for \${user.name}</h2>
+                    <p style="margin: 0 0 1.5rem 0; opacity: 0.8; font-size: 1rem;">Select your device and choose the apps you have</p>
+                </div>
+                
+                <div class="device-selection" style="margin-bottom: 2rem;">
+                    <label style="display: block; margin-bottom: 1rem; font-weight: 600; color: #64ffda;">📱 Your Device:</label>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem 1.5rem; background: #2d2d44; border-radius: 12px; border: 2px solid transparent; transition: all 0.3s;">
+                            <input type="radio" name="device" value="ios" checked style="accent-color: #64ffda;">
+                            <span style="font-weight: 500;">🍎 iPhone</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer; padding: 0.75rem 1.5rem; background: #2d2d44; border-radius: 12px; border: 2px solid transparent; transition: all 0.3s;">
+                            <input type="radio" name="device" value="android" style="accent-color: #64ffda;">
+                            <span style="font-weight: 500;">🤖 Android</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="platforms-header" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0 0 0.5rem 0; color: #64ffda; font-size: 1.3rem;">Select Apps You Have</h3>
+                    <p style="margin: 0; opacity: 0.7; font-size: 0.9rem;">Click on app names to download missing apps</p>
+                </div>
+                
                 <div id="preferencesForm">
-                    <div class="platform-preferences">
-                        <div class="platform-item">
-                            <h3>WhatsApp</h3>
-                            <label>
-                                <input type="checkbox" id="whatsapp-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="whatsapp-preference" min="1" max="10" value="5">
-                                <span id="whatsapp-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="whatsapp-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>Telegram</h3>
-                            <label>
-                                <input type="checkbox" id="telegram-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="telegram-preference" min="1" max="10" value="5">
-                                <span id="telegram-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="telegram-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>Signal</h3>
-                            <label>
-                                <input type="checkbox" id="signal-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="signal-preference" min="1" max="10" value="5">
-                                <span id="signal-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="signal-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>Discord</h3>
-                            <label>
-                                <input type="checkbox" id="discord-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="discord-preference" min="1" max="10" value="5">
-                                <span id="discord-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="discord-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>Slack</h3>
-                            <label>
-                                <input type="checkbox" id="slack-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="slack-preference" min="1" max="10" value="5">
-                                <span id="slack-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="slack-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>Messenger</h3>
-                            <label>
-                                <input type="checkbox" id="messenger-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="messenger-preference" min="1" max="10" value="5">
-                                <span id="messenger-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="messenger-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>iMessage</h3>
-                            <label>
-                                <input type="checkbox" id="imessage-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="imessage-preference" min="1" max="10" value="5">
-                                <span id="imessage-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="imessage-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
-                        
-                        <div class="platform-item">
-                            <h3>Teams</h3>
-                            <label>
-                                <input type="checkbox" id="teams-account" checked> Has Account
-                            </label>
-                            <label>
-                                Preference Level (1-10):
-                                <input type="range" id="teams-preference" min="1" max="10" value="5">
-                                <span id="teams-value">5</span>
-                            </label>
-                            <label>
-                                Notes:
-                                <input type="text" id="teams-notes" placeholder="Optional notes">
-                            </label>
-                        </div>
+                    <div class="platform-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                        \${generatePlatformCards()}
                     </div>
                     
-                    <div class="modal-actions" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: flex-end;">
-                        <button type="button" class="btn btn-secondary" onclick="closePreferencesModal()">Cancel</button>
-                        <button type="button" class="btn" onclick="savePreferences(\${user.id})">Save Preferences</button>
+                    <div class="modal-actions" style="display: flex; gap: 1rem; justify-content: flex-end; padding-top: 1rem; border-top: 1px solid #333;">
+                        <button type="button" class="btn-secondary" onclick="closePreferencesModal()" style="padding: 0.75rem 1.5rem; background: #555; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500; transition: all 0.3s;">Cancel</button>
+                        <button type="button" class="btn-primary" onclick="savePreferences(\${user.id})" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #64ffda 0%, #4db6ac 100%); color: #1a1a2e; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; transition: all 0.3s;">Save Preferences</button>
                     </div>
                 </div>
             \`;
@@ -921,58 +926,46 @@ app.get('/', (req, res) => {
             // Add CSS for the modal
             const style = document.createElement('style');
             style.textContent = \`
-                .platform-preferences {
-                    display: grid;
-                    gap: 1.5rem;
-                }
-                
-                .platform-item {
-                    background: #f8f9fa;
-                    padding: 1rem;
-                    border-radius: 8px;
-                    border: 1px solid #e9ecef;
-                }
-                
-                .platform-item h3 {
-                    color: #667eea;
-                    margin-bottom: 0.5rem;
-                }
-                
-                .platform-item label {
-                    display: block;
-                    margin-bottom: 0.5rem;
-                    font-weight: 500;
-                }
-                
-                .platform-item input[type="range"] {
-                    width: 100%;
-                    margin: 0.5rem 0;
-                }
-                
-                .platform-item input[type="text"] {
-                    width: 100%;
-                    padding: 0.5rem;
-                    border: 1px solid #ccc;
-                    border-radius: 4px;
-                    margin-top: 0.25rem;
-                }
-                
-                .modal-overlay {
-                    animation: fadeIn 0.3s ease-out;
-                }
-                
                 @keyframes fadeIn {
                     from { opacity: 0; }
                     to { opacity: 1; }
                 }
                 
-                .modal-content {
-                    animation: slideIn 0.3s ease-out;
-                }
-                
                 @keyframes slideIn {
                     from { transform: translateY(-50px); opacity: 0; }
                     to { transform: translateY(0); opacity: 1; }
+                }
+                
+                .platform-card:hover {
+                    border-color: #64ffda !important;
+                    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.1) !important;
+                }
+                
+                .platform-card.has-app {
+                    border-color: #64ffda !important;
+                    background: #1a2332 !important;
+                }
+                
+                .platform-link:hover {
+                    text-shadow: 0 0 8px currentColor !important;
+                }
+                
+                .device-selection label:hover {
+                    border-color: #64ffda !important;
+                    background: #1a2332 !important;
+                }
+                
+                .device-selection input[type="radio"]:checked + span {
+                    color: #64ffda !important;
+                }
+                
+                .btn-secondary:hover {
+                    background: #666 !important;
+                }
+                
+                .btn-primary:hover {
+                    transform: translateY(-2px) !important;
+                    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.3) !important;
                 }
             \`;
             
@@ -980,18 +973,60 @@ app.get('/', (req, res) => {
             modalOverlay.appendChild(modalContent);
             document.body.appendChild(modalOverlay);
             
-            // Add event listeners for range inputs
+            // Add event listeners for the new interface
             const platforms = ['whatsapp', 'telegram', 'signal', 'discord', 'slack', 'messenger', 'imessage', 'teams'];
+            
             platforms.forEach(platform => {
+                const checkbox = document.getElementById(\`\${platform}-has-app\`);
+                const slider = document.getElementById(\`\${platform}-slider\`);
                 const rangeInput = document.getElementById(\`\${platform}-preference\`);
                 const valueDisplay = document.getElementById(\`\${platform}-value\`);
+                const card = checkbox?.closest('.platform-card');
                 
-                if (rangeInput && valueDisplay) {
+                if (checkbox && slider && rangeInput && valueDisplay) {
+                    // Toggle slider visibility when checkbox is checked
+                    checkbox.addEventListener('change', (e) => {
+                        if (e.target.checked) {
+                            slider.style.display = 'block';
+                            card?.classList.add('has-app');
+                        } else {
+                            slider.style.display = 'none';
+                            card?.classList.remove('has-app');
+                        }
+                    });
+                    
+                    // Update value display when slider changes
                     rangeInput.addEventListener('input', (e) => {
                         valueDisplay.textContent = e.target.value;
                     });
                 }
             });
+            
+            // Add device selection functionality
+            const deviceRadios = document.querySelectorAll('input[name="device"]');
+            let selectedDevice = 'ios';
+            
+            deviceRadios.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    selectedDevice = e.target.value;
+                    updatePlatformLinks(selectedDevice);
+                });
+            });
+            
+            // Add platform link functionality
+            function updatePlatformLinks(device) {
+                const platformLinks = document.querySelectorAll('.platform-link');
+                platformLinks.forEach(link => {
+                    const platform = link.dataset.platform;
+                    link.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        openAppStore(platform, device);
+                    });
+                });
+            }
+            
+            // Initialize platform links
+            updatePlatformLinks(selectedDevice);
             
             // Close modal when clicking outside
             modalOverlay.addEventListener('click', (e) => {
@@ -1007,23 +1042,69 @@ app.get('/', (req, res) => {
                 modalOverlay.remove();
             }
         }
+        
+        function openAppStore(platform, device) {
+            // Get platform data including app store links
+            const platformData = {
+                whatsapp: {
+                    ios: 'https://apps.apple.com/app/whatsapp-messenger/id310633997',
+                    android: 'https://play.google.com/store/apps/details?id=com.whatsapp'
+                },
+                telegram: {
+                    ios: 'https://apps.apple.com/app/telegram-messenger/id686449807',
+                    android: 'https://play.google.com/store/apps/details?id=org.telegram.messenger'
+                },
+                signal: {
+                    ios: 'https://apps.apple.com/app/signal-private-messenger/id874139669',
+                    android: 'https://play.google.com/store/apps/details?id=org.thoughtcrime.securesms'
+                },
+                discord: {
+                    ios: 'https://apps.apple.com/app/discord/id985746746',
+                    android: 'https://play.google.com/store/apps/details?id=com.discord'
+                },
+                slack: {
+                    ios: 'https://apps.apple.com/app/slack/id618783545',
+                    android: 'https://play.google.com/store/apps/details?id=com.Slack'
+                },
+                messenger: {
+                    ios: 'https://apps.apple.com/app/messenger/id454638411',
+                    android: 'https://play.google.com/store/apps/details?id=com.facebook.orca'
+                },
+                imessage: {
+                    ios: 'https://apps.apple.com/app/messages/id1146560473',
+                    android: null
+                },
+                teams: {
+                    ios: 'https://apps.apple.com/app/microsoft-teams/id1113153706',
+                    android: 'https://play.google.com/store/apps/details?id=com.microsoft.teams'
+                }
+            };
+            
+            const link = platformData[platform]?.[device];
+            if (link) {
+                window.open(link, '_blank');
+            } else if (platform === 'imessage' && device === 'android') {
+                showAlert('iMessage is only available on Apple devices', 'info');
+            } else {
+                showAlert('App store link not available', 'error');
+            }
+        }
 
         async function savePreferences(userId) {
             const platforms = ['whatsapp', 'telegram', 'signal', 'discord', 'slack', 'messenger', 'imessage', 'teams'];
             const preferences = [];
             
-            // Collect preferences for each platform
+            // Collect preferences for each platform using the new opt-in approach
             platforms.forEach(platform => {
-                const hasAccount = document.getElementById(\`\${platform}-account\`)?.checked || false;
+                const hasApp = document.getElementById(\`\${platform}-has-app\`)?.checked || false;
                 const preferenceLevel = parseInt(document.getElementById(\`\${platform}-preference\`)?.value || 5);
-                const notes = document.getElementById(\`\${platform}-notes\`)?.value || '';
                 
-                if (hasAccount) {
+                if (hasApp) {
                     preferences.push({
                         platform,
                         preferenceLevel,
-                        hasAccount,
-                        notes
+                        hasAccount: true,
+                        notes: \`Preference level: \${preferenceLevel}/10\`
                     });
                 }
             });

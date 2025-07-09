@@ -23,7 +23,8 @@
       "Bash(npm run:*)",
       "Bash(lsof:*)",
       "Bash(npm test)",
-      "Bash(npx jest:*)"
+      "Bash(npx jest:*)",
+      "WebFetch(domain:chat-commune-connect.lovable.app)"
     ],
     "deny": []
   }
